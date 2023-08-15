@@ -2,9 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:pushh_notifcation/api/firebaseapi.dart';
+import 'package:pushh_notifcation/prac_notification.dart';
+
+import 'api/local_notification.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().init();
   await Firebase.initializeApp();
 
   // final fcm = await FirebaseMessaging.instance.getToken();
@@ -62,7 +66,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     firebaseApi.requestPermission();
+    firebaseApi.firebaseInit();
     firebaseApi.isTokenRefresh();
     firebaseApi.getDeviceToken().then((value) {
       print('VALUE');
@@ -128,7 +134,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return PracticeNotification();
+          }));
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
