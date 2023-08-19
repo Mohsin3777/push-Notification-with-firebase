@@ -11,9 +11,20 @@ Future<void> main() async {
   await NotificationService().init();
   await Firebase.initializeApp();
 
+ FirebaseMessaging.onBackgroundMessage(_firebaseMessegingBackgroundHandle);
+
   // final fcm = await FirebaseMessaging.instance.getToken();
   // await FirebaseApi().initNotifications();
   runApp(const MyApp());
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessegingBackgroundHandle(RemoteMessage message)async{
+  await Firebase.initializeApp();
+
+  print(message.notification!.title.toString());
+    print(message.notification!.body.toString());
+      print(message.data.toString());
 }
 
 class MyApp extends StatelessWidget {
@@ -68,7 +79,8 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     firebaseApi.requestPermission();
-    firebaseApi.firebaseInit();
+    firebaseApi.firebaseInit(context);
+    firebaseApi.setupInteractMessage(context);
     firebaseApi.isTokenRefresh();
     firebaseApi.getDeviceToken().then((value) {
       print('VALUE');

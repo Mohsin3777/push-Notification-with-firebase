@@ -1,10 +1,14 @@
+
+import 'dart:io';
 import 'dart:math';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pushh_notifcation/api/local_notification.dart';
+import 'package:pushh_notifcation/messages_screen.dart';
 
 class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
@@ -23,6 +27,11 @@ class FirebaseApi {
     );
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
+      onSelectNotification: (payload){
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>MessagesScreen()));
+handleMessage(context, message);
+      },
+      
       // onDidReceiveBackgroundNotificationResponse: (payload) {}
     );
   }
@@ -41,19 +50,32 @@ class FirebaseApi {
     print('FCM NOtification ' + fCMToken.toString());
   }
 
-  void firebaseInit() {
+  void firebaseInit(BuildContext context) {
     FirebaseMessaging.onMessage.listen((message) {
       if (kDebugMode) {
         print(message.notification!.title.toString());
         print(message.notification!.body.toString());
+                print(message.data.toString());
+                       print(message.data['type'].toString());
+                                     print(message.data['id'].toString());
 
-        NotificationService notificationService = NotificationService();
+                                 if(Platform.isAndroid){
+
+                                      initLocalNotification(context,message);         
+                                            showNotification(message);
+                                              NotificationService notificationService = NotificationService();
         notificationService.showNotification(
             message.notification!.title.toString(),
             message.notification!.body.toString());
+
+                                 }else{
+                                  initLocalNotification(context,message);
+                                 }
+
+
       }
 
-      showNotification(message);
+   
     });
   }
 
@@ -124,5 +146,26 @@ class FirebaseApi {
     } else {
       print('User not grented permission');
     }
+  }
+
+
+Future<void> setupInteractMessage(BuildContext context)async{
+  RemoteMessage? initialMessage  = await FirebaseMessaging.instance.getInitialMessage();
+//when app is terminated
+  if(initialMessage !=null){
+    handleMessage(context, initialMessage);
+  }
+
+  //when app is in background
+  FirebaseMessaging.onMessageOpenedApp.listen((event) {
+    handleMessage(context, event);
+  });
+}
+
+  void handleMessage(BuildContext context,RemoteMessage message)async{
+if(message.data['type'] == 'msg'){
+ 
+  Navigator.push(context, MaterialPageRoute(builder: (context)=>MessagesScreen()));
+}
   }
 }
