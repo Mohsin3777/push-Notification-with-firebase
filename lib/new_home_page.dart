@@ -1,9 +1,11 @@
 
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pushh_notifcation/new_notification_class/firebase_class.dart';
 import 'package:http/http.dart' as http;
+import 'package:pushh_notifcation/not_package_screen.dart';
 
 class NEWHOMEPAGE extends StatefulWidget {
   const NEWHOMEPAGE({super.key});
@@ -23,11 +25,27 @@ FirebaseNewClass firebaseNewClass =FirebaseNewClass();
 // firebaseNewClass.isTokenRefresh();
 firebaseNewClass.firebaseInit(context);
 firebaseNewClass.setupInteractMessage(context);
-    firebaseNewClass.getDeviceToken().then((value) {
+    firebaseNewClass.getDeviceToken().then((value)async{
       print('Device token');
+    await  createuserDocument(value);
       print(value);
     });
  
+  }
+
+
+  Future<void> createuserDocument(String token)async{
+    var myData = {'foo': 0, 'bar': true};
+    var collection = FirebaseFirestore.instance.collection('collection');
+
+    collection 
+    .doc(token).set({
+
+      "token":token,
+      "name":"emulator"
+    }) // <-- Your data
+    .then((_) => print('Added'))
+    .catchError((error) => print('Add failed: $error'));
   }
   @override
   Widget build(BuildContext context) {
@@ -41,7 +59,8 @@ Center(
   child: TextButton(child: Text('PRESS'),onPressed: (){
 firebaseNewClass.getDeviceToken().then((value)async {
   var data ={
-    'to':value.toString(),
+    // 'to':value.toString(),
+    "to": "/topics/TPITO",
     'priority': 'high',
     'notification':{
       'title':'Asif',
@@ -61,7 +80,15 @@ headers: {
 );
 });
   },),
-)
+
+
+),
+
+SizedBox(height: 30,),
+
+ElevatedButton(onPressed: (){
+  Navigator.push(context, MaterialPageRoute(builder: (context)=>NotficPackageScreen()));
+}, child: Text('permission'))
         ],
       ),
     );

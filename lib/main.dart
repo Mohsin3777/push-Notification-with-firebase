@@ -7,17 +7,6 @@ import 'package:pushh_notifcation/prac_notification.dart';
 
 import 'api/local_notification.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService().init();
-  await Firebase.initializeApp();
-
- FirebaseMessaging.onBackgroundMessage(_firebaseMessegingBackgroundHandle);
-
-  // final fcm = await FirebaseMessaging.instance.getToken();
-  // await FirebaseApi().initNotifications();
-  runApp(const MyApp());
-}
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessegingBackgroundHandle(RemoteMessage message)async{
@@ -27,6 +16,33 @@ Future<void> _firebaseMessegingBackgroundHandle(RemoteMessage message)async{
     print(message.notification!.body.toString());
       print(message.data.toString());
 }
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+   await Firebase.initializeApp();
+  await NotificationService().init();
+ 
+
+ FirebaseMessaging.onBackgroundMessage(_firebaseMessegingBackgroundHandle);
+
+
+//  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+//         // showAlertDialog(navigatorKey.currentContext!,message.notification!.title.toString(), message.notification!.body, null);
+//   print('A new event was published!');
+//   print(message.toString() +'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+//   // message.data.clear();
+// });
+
+  // final fcm = await FirebaseMessaging.instance.getToken();
+  // await FirebaseApi().initNotifications();
+
+
+  //fro all users
+  await FirebaseMessaging.instance.subscribeToTopic('TPITO'); //for sending to all users
+
+  runApp(const MyApp());
+}
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

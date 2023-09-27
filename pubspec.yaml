@@ -44,6 +44,15 @@ dependencies:
 
   app_settings: ^4.2.0
 
+
+  overlay_support: ^2.1.0   # to show toast overly
+
+
+  cloud_firestore: ^4.9.2
+  notification_permissions: ^0.6.1
+
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
